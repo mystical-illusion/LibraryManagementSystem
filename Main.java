@@ -17,6 +17,9 @@ import strategy.FineCalculator;
 import strategy.StandardFineStrategy;
 import strategy.GracePeriodFineStrategy;
 import builder.BookBuilder;
+import facade.LibraryFacade;
+import factories.MemberFactory;
+import factories.BookFactory;
 
 public class Main {
         public static void main(String[] args) {
@@ -108,6 +111,23 @@ public class Main {
                                 .build();
 
                 b5.getDetails();
+
+                LibraryFacade facade = new LibraryFacade();
+
+                Member student = MemberFactory.createMember("student", 501, "Anjali", "CS", "anjali@email.com");
+                Book book = BookFactory.createBook("technical", "B006", "The Pragmatic Programmer",
+                                "Dave Thomas", "978-0135957059",
+                                "Addison-Wesley", "2nd", "E5-501");
+
+                facade.registerMember(student); // ONE call does Singleton + Observer!
+                facade.addBook(book);
+
+                facade.issueBook(student, book, "T003", "2026-06-26"); // ONE call does Command + Observer!
+
+                double fine = facade.checkFine(student, 7);
+                System.out.println("Fine for 7 days late: ₹" + fine);
+
+                facade.returnBook(student, book, "T003");
 
         }
 }
