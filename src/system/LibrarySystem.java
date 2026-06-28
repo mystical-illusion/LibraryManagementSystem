@@ -1,17 +1,15 @@
-package models;
+package system;
 
 import java.util.ArrayList;
 import java.util.List;
+import models.Book;
+import models.Member;
 
 public class LibrarySystem {
-    // Rule 1 — private static instance
     private static LibrarySystem instance;
-
-    // storage for books and members
     private List<Book> books;
     private List<Member> members;
 
-    // Rule 2 — private constructor
     private LibrarySystem() {
         books = new ArrayList<>();
         members = new ArrayList<>();
@@ -41,5 +39,4 @@ public class LibrarySystem {
             System.out.println("---");
         }
     }
-
 }

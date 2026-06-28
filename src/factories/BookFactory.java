@@ -1,4 +1,8 @@
-package models;
+package factories;
+
+import models.Book;
+import models.TechnicalBook;
+import models.StoryBook;
 
 public class BookFactory {
     public static Book createBook(String category, String bookId,

@@ -1,4 +1,9 @@
-package models;
+package factories;
+
+import models.Member;
+import models.Student;
+import models.Professor;
+import models.NonTeachingStaff;
 
 public class MemberFactory {
     public static Member createMember(String type, int memberId,
@@ -13,6 +18,6 @@ public class MemberFactory {
         if (type.equals("staff")) {
             return new NonTeachingStaff(memberId, name, department, email);
         }
-        return null; // unknown type
+        return null;
     }
 }

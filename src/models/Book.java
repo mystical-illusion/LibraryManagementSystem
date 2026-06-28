@@ -7,4 +7,6 @@ public interface Book {
 
     void setAvailable(boolean status); // update status
 
+    String getBookId();
+
 }

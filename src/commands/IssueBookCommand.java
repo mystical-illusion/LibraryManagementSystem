@@ -1,4 +1,8 @@
-package models;
+package commands;
+
+import models.Member;
+import models.Book;
+import models.Transaction;
 
 public class IssueBookCommand implements Command {
     private Member member;
@@ -14,17 +18,16 @@ public class IssueBookCommand implements Command {
         this.issueDate = issueDate;
     }
 
-   public void execute() {
-    if (book.isAvailable()) {
-        book.setAvailable(false); // actually change the status!
-        // create a Transaction object here too!
-        new Transaction(transactionId, member.getMemberId(), transactionId, issueDate);
-        // hint: new Transaction(transactionId, member.getMemberId(), ???, issueDate)
-        System.out.println("Book issued: " + transactionId);
-    } else {
-        System.out.println("Book is not available");
+    public void execute() {
+        if (book.isAvailable()) {
+            book.setAvailable(false);
+            new Transaction(transactionId, member.getMemberId(),
+                    book.getBookId(), issueDate);
+            System.out.println("Book issued: " + transactionId);
+        } else {
+            System.out.println("Book is not available");
+        }
     }
-}
 
     public void undo() {
         book.setAvailable(true);

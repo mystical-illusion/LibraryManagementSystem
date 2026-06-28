@@ -1,13 +1,22 @@
 
 // File: src/Main.java
 import models.Book;
-import models.BookFactory;
-import models.LibrarySystem;
 import models.Member;
-import models.MemberFactory;
 import models.Student;
 import models.Professor;
 import models.NonTeachingStaff;
+import factories.MemberFactory;
+import factories.BookFactory;
+import system.LibrarySystem;
+import builder.BookBuilder;
+import commands.Command;
+import commands.IssueBookCommand;
+import commands.ReturnBookCommand;
+import observers.NotificationSystem;
+import strategy.FineCalculator;
+import strategy.StandardFineStrategy;
+import strategy.GracePeriodFineStrategy;
+import builder.BookBuilder;
 
 public class Main {
         public static void main(String[] args) {
@@ -46,6 +55,59 @@ public class Main {
                 library.addBook(b1); // b1 already exists from earlier!
 
                 library.listAllBooks();
+
+                Member m4 = MemberFactory.createMember("student", 401, "Priya", "IT", "priya@email.com");
+                Book b4 = BookFactory.createBook("technical", "B004", "Design Patterns",
+                                "Gang of Four", "978-0201633610",
+                                "Addison-Wesley", "1st", "C3-301");
+
+                Command issueCommand = new IssueBookCommand(m4, b4, "T001", "2026-06-26");
+                issueCommand.execute(); // should issue the book!
+
+                System.out.println("Is book available now? " + b4.isAvailable());
+
+                issueCommand.undo(); // undo the issue!
+                System.out.println("Is book available after undo? " + b4.isAvailable());
+
+                Command returnCommand = new ReturnBookCommand(m4, b4, "T002");
+                returnCommand.execute(); // book should already be available (from earlier undo), so this should say
+                                         // "not issued"!
+
+                issueCommand.execute(); // issue it again first
+                returnCommand.execute(); //
+
+                NotificationSystem notifier = new NotificationSystem();
+                notifier.addObserver(m1); // m1 is a Student - now also an Observer!
+                notifier.addObserver(m2); // m2 is a Professor
+
+                notifier.notifyAll("Library closes early today at 5 PM!");
+
+                notifier.removeObserver(m2);
+                notifier.notifyAll("New books arrived in CS section!");
+
+                FineCalculator calculator = new FineCalculator(new StandardFineStrategy());
+                double fine1 = calculator.calculate(m1, 5); // Student, 5 days late
+                System.out.println("Standard fine for Ravi (5 days late): ₹" + fine1);
+
+                calculator.setStrategy(new GracePeriodFineStrategy());
+                double fine2 = calculator.calculate(m1, 5); // same 5 days, different strategy!
+                System.out.println("Grace period fine for Ravi (5 days late): ₹" + fine2);
+
+                double fine3 = calculator.calculate(m1, 2); // within grace period!
+                System.out.println("Grace period fine for Ravi (2 days late): ₹" + fine3);
+
+                Book b5 = new BookBuilder()
+                                .setBookId("B005")
+                                .setTitle("Effective Java")
+                                .setAuthor("Joshua Bloch")
+                                .setIsbn("978-0134685991")
+                                .setPublisher("Addison-Wesley")
+                                .setEdition("3rd")
+                                .setShelfLocation("D4-410")
+                                .setCategory("technical")
+                                .build();
+
+                b5.getDetails();
 
         }
 }

@@ -1,6 +1,8 @@
 package models;
 
-public abstract class Member {
+import observers.Observer;
+
+public abstract class Member implements Observer {
     private int memberId;
     private String name;
     private String department;
@@ -33,6 +35,10 @@ public abstract class Member {
 
     public String getEmail() {
         return email;
+    }
+
+    public void receiveNotification(String message) {
+        System.out.println(name + " notified: " + message);
     }
 
     public void display() {

@@ -42,4 +42,8 @@ public class TechnicalBook implements Book {
         this.isAvailable = status;
     }
 
+    public String getBookId() {
+        return bookId;
+    }
+
 }

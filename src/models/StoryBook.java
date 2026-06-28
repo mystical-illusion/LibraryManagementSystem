@@ -41,4 +41,9 @@ public class StoryBook implements Book {
     public void setAvailable(boolean status) {
         this.isAvailable = status;
     }
+
+    public String getBookId() {
+        return bookId;
+    }
+
 }
