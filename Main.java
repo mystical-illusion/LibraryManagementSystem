@@ -20,6 +20,10 @@ import builder.BookBuilder;
 import facade.LibraryFacade;
 import factories.MemberFactory;
 import factories.BookFactory;
+import database.DatabaseConnection;
+import facade.LibraryFacade;
+import java.sql.Connection;
+import javax.swing.SwingUtilities;
 
 public class Main {
         public static void main(String[] args) {
@@ -128,6 +132,29 @@ public class Main {
                 System.out.println("Fine for 7 days late: ₹" + fine);
 
                 facade.returnBook(student, book, "T003");
+
+                System.out.println("=== Initializing Library Management System ===");
+
+                // 1. Verify our MySQL Database Connection on startup
+                Connection conn = DatabaseConnection.getConnection();
+
+                if (conn == null) {
+                        System.err.println("🛑 System failure: Could not establish database connection. Exiting...");
+                        return;
+                }
+
+                // 2. Initialize your central structural Facade pattern
+                // (Pass the database connection down if your architecture requires it)
+                LibraryFacade librarySystem = new LibraryFacade();
+
+                System.out.println("\n=== System Active ===");
+
+                System.out.println("Launching Graphical User Interface...");
+
+                // Safely spin up the window application thread
+                SwingUtilities.invokeLater(() -> {
+                        new LibraryUI().setVisible(true);
+                });
 
         }
 }
