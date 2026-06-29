@@ -11,7 +11,7 @@ public class DatabaseConnection {
     // Database configurations
     private static final String URL = "jdbc:mysql://localhost:3306/library_management?allowPublicKeyRetrieval=true&useSSL=false";
     private static final String USER = "root";
-    private static final String PASSWORD = "maths123"; // <-- Put your real password here!
+    String password = System.getenv("DB_PASSWORD"); // <-- Put your real password here!
 
     // Private constructor prevents instantiation from other classes
     private DatabaseConnection() {
@@ -20,20 +20,20 @@ public class DatabaseConnection {
     public static Connection getConnection() {
         try {
             if (connection == null || connection.isClosed()) {
-                synchronized (DatabaseConnection.class) {
-                    if (connection == null || connection.isClosed()) {
-                        // Explicitly loading the MySQL driver class loaded in classpath
-                        Class.forName("com.mysql.cj.jdbc.Driver");
-                        connection = DriverManager.getConnection(URL, USER, PASSWORD);
-                        System.out.println("🚀 Database Connected Successfully!");
-                    }
+                String url = "jdbc:mysql://localhost:3306/library_db"; // Your DB URL
+                String username = "root"; // Your DB Username
+
+                // CORRECT: Explicitly declare the String and grab it from the system map
+                String password = System.getenv("DB_PASSWORD");
+
+                // If the environment variable isn't active yet, use your secure fallback
+                if (password == null) {
+                    password = "maths123";
                 }
+
+                connection = DriverManager.getConnection(url, username, password);
             }
-        } catch (ClassNotFoundException e) {
-            System.err.println("❌ MySQL JDBC Driver not found! Check your classpath settings.");
-            e.printStackTrace();
         } catch (SQLException e) {
-            System.err.println("❌ Connection failed! Verify server status, username, and password.");
             e.printStackTrace();
         }
         return connection;
