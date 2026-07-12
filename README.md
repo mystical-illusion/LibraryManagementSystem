@@ -1,43 +1,128 @@
-# 📚 Advanced Library Management System
+# 📚 Library Management System
 
-A robust, enterprise-grade desktop Library Management System built with **Java Swing** and a persistent **MySQL database**. This project showcases the seamless architectural integration of **7 core Object-Oriented Design Patterns** (Creational, Structural, and Behavioral) to build scalable, clean, and decoupling application logic.
-
----
-
-## 🛠️ System Architecture & Design Patterns
-
-This system deliberately avoids messy, tightly-coupled code by splitting responsibilities across dedicated design patterns:
-
-### 1. Creational Patterns
-
-- **Factory Method:** Abstracted model generation through `BookFactory` and `MemberFactory` to dynamically instantiate concrete types (e.g., _Technical Books_, _Story Books_, _Students_, _Faculty_) at runtime.
-- **Singleton:** Enforces a single, globally accessible instance of the core `LibrarySystem` and database connection managers to maintain an accurate transactional state.
-
-### 2. Structural Patterns
-
-- **Facade (`LibraryFacade`):** Acts as a unified entry bridge for the user interface, wrapping complex backend subsystem operations (`issueBook`, `returnBook`) into simplified, high-level API calls.
-
-### 3. Behavioral Patterns
-
-- **Command:** Encapsulates system transactions (`IssueBookCommand`, `ReturnBookCommand`) as standalone transaction objects, allowing decoupled execution tracking and native `undo()` capabilities.
-- **Observer:** Implements a dynamic `NotificationSystem`. Registered library members are automatically tracked as observers and notified instantly when system milestones or transaction modifications trigger.
-- **Strategy:** Decouples late-return compliance and fine calculation structures (`StandardFineStrategy`, `GracePeriodFineStrategy`) allowing the application to swap penalty computations dynamically based on member categories.
+A full-stack Library Management System built in Java, 
+demonstrating mastery of Object-Oriented Programming, 
+7 Design Patterns, SOLID Principles, MySQL database 
+integration, and a Swing GUI.
 
 ---
 
-## 🖥️ Graphical User Interface (GUI)
+## 🏗️ Architecture
 
-The user interface features a sleek, multi-tab layout built using Java Swing (`JTabbedPane`) to organize system output cleanly and prevent terminal clutter:
-
-- **📋 Live Transactions Tab:** A dedicated console panel capturing real-time transaction inputs, generating polymorphic tracking tokens (`TX-XXXXX`), and routing issues and returns.
-- **🔔 Notification Hub Tab:** Tracks the live broadcast stream from the Observer pattern, displaying automated alerts to specific members instantly.
-- **💰 Fines & Compliance Tab:** Isolates penalty strategy evaluations and rule checks away from standard transaction logging views.
+```
+src/
+├── models/      → Member hierarchy, Book hierarchy, Transaction
+├── factories/   → MemberFactory, BookFactory (Factory Pattern)
+├── system/      → LibrarySystem (Singleton Pattern)
+├── commands/    → IssueBookCommand, ReturnBookCommand (Command Pattern)
+├── observers/   → NotificationSystem (Observer Pattern)
+├── strategy/    → FineCalculator, Fine strategies (Strategy Pattern)
+├── builder/     → BookBuilder (Builder Pattern)
+├── facade/      → LibraryFacade (Facade Pattern)
+└── database/    → DatabaseConnection, MemberDAO, BookDAO, TransactionDAO
+```
 
 ---
 
-## ⚙️ Configuration & Local Security
+## ✅ Design Patterns Implemented (7)
 
-Database configurations are strictly decoupled from the code to prevent security leakage on public version control histories:
+| Pattern | Where Used | Purpose |
+|---------|-----------|---------|
+| Singleton | LibrarySystem | One central library instance |
+| Factory | MemberFactory, BookFactory | Create member/book types |
+| Observer | NotificationSystem | Auto-notify members on transactions |
+| Strategy | FineCalculator | Swap fine calculation logic at runtime |
+| Builder | BookBuilder | Construct Book objects with method chaining |
+| Command | IssueBookCommand, ReturnBookCommand | Issue/Return with undo support |
+| Facade | LibraryFacade | Unified simple API over complex subsystems |
 
-- Credentials are stored locally in an untracked `.env` configuration file.
-- The `.gitignore` engine blocks deployment of environment variables while allowing clean contribution tracking across the public codebase.
+---
+
+## 👥 Member Hierarchy (Polymorphism + LSP)
+
+```
+Member (abstract)
+├── Student     → maxBooks: 3, loanPeriod: 14 days, fine: ₹5/day
+├── Professor   → maxBooks: 5, loanPeriod: 20 days, fine: ₹1/day
+└── NonTeachingStaff → maxBooks: 3, loanPeriod: 10 days, fine: ₹3/day
+```
+
+Librarian kept SEPARATE from Member hierarchy (LSP compliance)
+
+---
+
+## 📖 Book Types (Factory + Builder)
+
+```
+Book (interface)
+├── TechnicalBook → subject books, shelf-coded by department
+└── StoryBook     → fiction/general books, separate section
+```
+
+---
+
+## 🗄️ Database Schema (MySQL)
+
+```sql
+members      → member_id, name, department, email, member_type
+books        → book_id, title, author, isbn, publisher, 
+               edition, shelf_location, is_available, category
+transactions → transaction_id, member_id (FK), book_id (FK), 
+               issue_date, return_date, fine_amount
+```
+
+JOIN query for full transaction details:
+```sql
+SELECT m.name, b.title, t.issue_date, t.fine_amount
+FROM transactions t
+JOIN members m ON t.member_id = m.member_id
+JOIN books b ON t.book_id = b.book_id;
+```
+
+---
+
+## 🖥️ GUI Features (Java Swing)
+
+- Issue Book with real-time validation
+- Return Book with automatic fine calculation
+- Live Transactions tab
+- Notification Hub tab
+- Fines & Compliance tab
+
+---
+
+## 🔑 SOLID Principles Applied
+
+- **SRP** — Each class has one responsibility (DAO classes handle only DB operations)
+- **OCP** — Add new book/member types without modifying existing code
+- **LSP** — Librarian separate from Member (doesn't borrow books)
+- **ISP** — Book interface only defines what ALL books need
+- **DIP** — LibraryFacade depends on abstractions, not concrete classes
+
+---
+
+## 🛠️ Tech Stack
+
+- Java (OOP, Design Patterns)
+- MySQL (JDBC, Normalization, Foreign Keys)
+- Java Swing (GUI)
+- Git/GitHub
+
+---
+
+## 🚀 How to Run
+
+1. Clone the repository
+2. Set up MySQL database using `schema.sql`
+3. Add `mysql-connector-j-9.7.0.jar` to `lib/` folder
+4. Configure VS Code classpath to include the JAR
+5. Run `Main.java`
+
+---
+
+## 📊 Key Design Decisions
+
+- **Book as interface** (not abstract class) — TechnicalBook and StoryBook share contract, not state
+- **Librarian separate from Member** — LSP compliance, Librarian doesn't borrow books
+- **DAO pattern for database** — separates business logic from SQL (SRP)
+- **Facade as single entry point** — GUI only talks to LibraryFacade, never directly to subsystems
