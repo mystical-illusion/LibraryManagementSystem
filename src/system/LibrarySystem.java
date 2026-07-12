@@ -39,4 +39,24 @@ public class LibrarySystem {
             System.out.println("---");
         }
     }
+
+    // NEW — find member by ID
+    public Member findMember(int memberId) {
+        for (Member m : members) {
+            if (m.getMemberId() == memberId) {
+                return m;
+            }
+        }
+        return null;
+    }
+
+    // NEW — find book by ID
+    public Book findBook(String bookId) {
+        for (Book b : books) {
+            if (b.getBookId().equals(bookId)) {
+                return b;
+            }
+        }
+        return null;
+    }
 }

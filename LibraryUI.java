@@ -5,35 +5,33 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import facade.LibraryFacade;
-import models.Book;
-import models.Member;
 import factories.BookFactory;
 import factories.MemberFactory;
+import models.Book;
+import models.Member;
+import system.LibrarySystem;
+import builder.BookBuilder;
 
 public class LibraryUI extends JFrame {
     private LibraryFacade libraryFacade;
 
-    // UI Input Components
     private JTextField memberIdField, bookIdField;
     private JButton issueButton, returnButton;
 
-    // Dedicated Organized Text Areas for Logging
     private JTextArea transactionLogArea;
     private JTextArea notificationLogArea;
     private JTextArea fineLogArea;
 
     public LibraryUI() {
-        // 1. Initialize backend link
         libraryFacade = new LibraryFacade();
+        loadSampleData();
 
-        // 2. Configure Main Window Frame
-        setTitle("Library Management System - Executive Dashboard");
+        setTitle("Library Management System");
         setSize(650, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center window
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout(10, 10));
 
-        // 3. Create Shared Input Panel (Top)
         JPanel inputPanel = new JPanel(new GridLayout(2, 2, 10, 10));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Operation Parameters"));
 
@@ -41,33 +39,25 @@ public class LibraryUI extends JFrame {
         memberIdField = new JTextField();
         inputPanel.add(memberIdField);
 
-        inputPanel.add(new JLabel("  Book ID (e.g., T001):"));
+        inputPanel.add(new JLabel("  Book ID (e.g., B001):"));
         bookIdField = new JTextField();
         inputPanel.add(bookIdField);
 
         add(inputPanel, BorderLayout.NORTH);
 
-        // 4. Create the Tabbed Layout Interface (Center Component)
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        // TAB A: Transaction Logs
         transactionLogArea = createStyledTextArea();
-        tabbedPane.addTab("📋 Live Transactions", new JScrollPane(transactionLogArea));
+        tabbedPane.addTab("Live Transactions", new JScrollPane(transactionLogArea));
 
-        // TAB B: Notification Stream
         notificationLogArea = createStyledTextArea();
-        tabbedPane.addTab("🔔 Notification Hub", new JScrollPane(notificationLogArea));
+        tabbedPane.addTab("Notification Hub", new JScrollPane(notificationLogArea));
 
-        // TAB C: Fines & Strategies
         fineLogArea = createStyledTextArea();
-        tabbedPane.addTab("💰 Fines & Compliance", new JScrollPane(fineLogArea));
+        tabbedPane.addTab("Fines & Compliance", new JScrollPane(fineLogArea));
 
         add(tabbedPane, BorderLayout.CENTER);
 
-        // Pre-populate historical demo records cleanly inside their respective slots
-        populateInitialHistoricalLogs();
-
-        // 5. Create Control Action Buttons (Bottom)
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 30, 10));
         issueButton = new JButton("Issue Book");
         returnButton = new JButton("Return Book");
@@ -81,13 +71,47 @@ public class LibraryUI extends JFrame {
         buttonPanel.add(returnButton);
         add(buttonPanel, BorderLayout.SOUTH);
 
-        // 6. Hook up Action Handlers
         setupActionListeners();
+        populateInitialLogs();
     }
 
-    /**
-     * Component Helper to enforce clean typography across all log sub-views
-     */
+    private void loadSampleData() {
+        Member m1 = MemberFactory.createMember("student", 101,
+                "Ravi", "CS", "ravi@email.com");
+        Member m2 = MemberFactory.createMember("professor", 201,
+                "Dr. Sharma", "CS", "sharma@email.com");
+        Member m3 = MemberFactory.createMember("staff", 301,
+                "Amit", "Admin", "amit@email.com");
+
+        Book b1 = new BookBuilder()
+                .setBookId("B001").setTitle("Clean Code")
+                .setAuthor("Robert Martin").setIsbn("978-0132350884")
+                .setPublisher("Prentice Hall").setEdition("1st")
+                .setShelfLocation("A1-101").setCategory("technical")
+                .build();
+
+        Book b2 = new BookBuilder()
+                .setBookId("B002").setTitle("Harry Potter")
+                .setAuthor("J.K. Rowling").setIsbn("978-0747532699")
+                .setPublisher("Bloomsbury").setEdition("1st")
+                .setShelfLocation("B2-205").setCategory("story")
+                .build();
+
+        Book b3 = new BookBuilder()
+                .setBookId("B003").setTitle("Effective Java")
+                .setAuthor("Joshua Bloch").setIsbn("978-0134685991")
+                .setPublisher("Addison-Wesley").setEdition("3rd")
+                .setShelfLocation("C3-301").setCategory("technical")
+                .build();
+
+        libraryFacade.registerMember(m1);
+        libraryFacade.registerMember(m2);
+        libraryFacade.registerMember(m3);
+        libraryFacade.addBook(b1);
+        libraryFacade.addBook(b2);
+        libraryFacade.addBook(b3);
+    }
+
     private JTextArea createStyledTextArea() {
         JTextArea textArea = new JTextArea();
         textArea.setEditable(false);
@@ -97,115 +121,138 @@ public class LibraryUI extends JFrame {
         return textArea;
     }
 
-    /**
-     * Organizes the old messy initialization logs into their proper tabs
-     * automatically on launch
-     */
-    private void populateInitialHistoricalLogs() {
-        // Populating the Transaction Tab
+    private void populateInitialLogs() {
         transactionLogArea.append("[INIT] LibrarySystem initialized!\n");
-        transactionLogArea.append("[INIT] Default Members & Books added to system memory storage.\n");
-        transactionLogArea.append("----------------------------------------------------------------\n");
+        transactionLogArea.append("[INIT] 3 Members and 3 Books loaded!\n");
+        transactionLogArea.append("Members: Ravi(101), Dr.Sharma(201), Amit(301)\n");
+        transactionLogArea.append("Books: B001-Clean Code, B002-Harry Potter, B003-Effective Java\n");
+        transactionLogArea.append("---\n");
 
-        // Populating the Notification Tab
-        notificationLogArea.append("[SYSTEM] Observers registered for notifications natively!\n");
-        notificationLogArea.append("Ravi notified: Library closes early today at 5 PM!\n");
-        notificationLogArea.append("Dr. Sharma notified: Library closes early today at 5 PM!\n");
-        notificationLogArea.append("Anjali notified: Anjali issued: B006\n");
-        notificationLogArea.append("----------------------------------------------------------------\n");
+        notificationLogArea.append("[SYSTEM] Observer registered for all 3 members!\n");
+        notificationLogArea.append("---\n");
 
-        // Populating the Fine Calculations Tab
-        fineLogArea.append("[STRATEGY] Standard fine for Ravi (5 days late): ₹25.0\n");
-        fineLogArea.append("[STRATEGY] Grace period fine for Ravi (5 days late): ₹10.0\n");
-        fineLogArea.append("[STRATEGY] Grace period fine for Ravi (2 days late): ₹0.0\n");
-        fineLogArea.append("[SYSTEM] Fine for 7 days late evaluated: ₹35.0\n");
-        fineLogArea.append("----------------------------------------------------------------\n");
+        fineLogArea.append("[SYSTEM] Fine strategies ready!\n");
+        fineLogArea.append("[INFO] Student fine rate: Rs.5/day\n");
+        fineLogArea.append("[INFO] Professor fine rate: Rs.2/day\n");
+        fineLogArea.append("[INFO] Staff fine rate: Rs.3/day\n");
+        fineLogArea.append("---\n");
     }
 
     private void setupActionListeners() {
-        // --- ISSUE BOOK ACTION ---
         issueButton.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 String rawMemberId = memberIdField.getText().trim();
                 String bookId = bookIdField.getText().trim();
 
                 if (rawMemberId.isEmpty() || bookId.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please supply parameters to process transaction.");
+                    JOptionPane.showMessageDialog(null,
+                            "Please enter both Member ID and Book ID!");
                     return;
                 }
 
                 try {
                     int memberId = Integer.parseInt(rawMemberId);
-                    String generatedTxId = "TX-" + System.currentTimeMillis() % 100000;
-                    String currentDateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
 
-                    Member dummyMember = MemberFactory.createMember("student", memberId, "User-" + memberId, "CS",
-                            "user@email.com");
-                    Book dummyBook = BookFactory.createBook("technical", bookId, "Book-" + bookId, "Author", "ISBN",
-                            "Publisher", "1st", "A1");
-                    dummyBook.setAvailable(true);
+                    Member member = LibrarySystem.getInstance().findMember(memberId);
+                    Book book = LibrarySystem.getInstance().findBook(bookId);
 
-                    // Execute unaltered backend process
-                    libraryFacade.issueBook(dummyMember, dummyBook, generatedTxId, currentDateStr);
+                    if (member == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Member ID " + memberId + " not found!\n" +
+                                        "Available: 101 (Ravi), 201 (Dr.Sharma), 301 (Amit)");
+                        return;
+                    }
 
-                    // Cleanly route updates straight to the Live Transactions Tab
-                    transactionLogArea.append(String.format("[%s] Issued Book %s to Member %d (ID: %s)\n",
-                            currentDateStr, bookId, memberId, generatedTxId));
+                    if (book == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Book ID " + bookId + " not found!\n" +
+                                        "Available: B001, B002, B003");
+                        return;
+                    }
 
-                    // Route the side-effect alert straight to the Notification Hub Tab
-                    notificationLogArea
-                            .append(String.format("[BROADCAST] User-%d notified: Issued: %s\n", memberId, bookId));
+                    if (!book.isAvailable()) {
+                        JOptionPane.showMessageDialog(null,
+                                "Book " + bookId + " is already issued!");
+                        return;
+                    }
+
+                    String txId = "TX-" + System.currentTimeMillis() % 100000;
+                    String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+                    libraryFacade.issueBook(member, book, txId, date);
+
+                    transactionLogArea.append(String.format(
+                            "[%s] Book %s issued to %s (TX: %s)\n",
+                            date, bookId, member.getName(), txId));
+
+                    notificationLogArea.append(String.format(
+                            "[ALERT] %s notified: Issued book %s\n",
+                            member.getName(), bookId));
 
                     clearInputs();
+
                 } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(null, "Member ID tracking token must be numeric.");
+                    JOptionPane.showMessageDialog(null,
+                            "Member ID must be a number!");
                 }
             }
         });
 
-        // --- RETURN BOOK ACTION ---
         returnButton.addActionListener(new ActionListener() {
-            @Override
             public void actionPerformed(ActionEvent e) {
                 String rawMemberId = memberIdField.getText().trim();
                 String bookId = bookIdField.getText().trim();
 
-                if (bookId.isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "Please define a Book ID token.");
+                if (rawMemberId.isEmpty() || bookId.isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "Please enter both Member ID and Book ID!");
                     return;
                 }
 
-                int memberId = 101;
-                if (!rawMemberId.isEmpty()) {
-                    try {
-                        memberId = Integer.parseInt(rawMemberId);
-                    } catch (NumberFormatException ex) {
+                try {
+                    int memberId = Integer.parseInt(rawMemberId);
+
+                    Member member = LibrarySystem.getInstance().findMember(memberId);
+                    Book book = LibrarySystem.getInstance().findBook(bookId);
+
+                    if (member == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Member ID " + memberId + " not found!");
+                        return;
                     }
+
+                    if (book == null) {
+                        JOptionPane.showMessageDialog(null,
+                                "Book ID " + bookId + " not found!");
+                        return;
+                    }
+
+                    if (book.isAvailable()) {
+                        JOptionPane.showMessageDialog(null,
+                                "Book " + bookId + " is not currently issued!");
+                        return;
+                    }
+
+                    String txId = "TX-" + System.currentTimeMillis() % 100000;
+                    String date = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
+
+                    libraryFacade.returnBook(member, book, txId);
+
+                    transactionLogArea.append(String.format(
+                            "[%s] Book %s returned by %s (TX: %s)\n",
+                            date, bookId, member.getName(), txId));
+
+                    double fine = libraryFacade.checkFine(member, 5);
+                    fineLogArea.append(String.format(
+                            "[%s] %s returned %s. Fine (5 days): Rs.%.1f\n",
+                            date, member.getName(), bookId, fine));
+
+                    clearInputs();
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(null,
+                            "Member ID must be a number!");
                 }
-
-                String generatedTxId = "TX-" + System.currentTimeMillis() % 100000;
-                String currentDateStr = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-
-                Member dummyMember = MemberFactory.createMember("student", memberId, "User-" + memberId, "CS",
-                        "user@email.com");
-                Book dummyBook = BookFactory.createBook("technical", bookId, "Book-" + bookId, "Author", "ISBN",
-                        "Publisher", "1st", "A1");
-                dummyBook.setAvailable(false);
-
-                // Execute unaltered backend process
-                libraryFacade.returnBook(dummyMember, dummyBook, generatedTxId);
-
-                // Append cleanly to the dedicated Transaction tab view
-                transactionLogArea.append(String.format("[%s] Returned Book %s via Tracking Token: %s\n",
-                        currentDateStr, bookId, generatedTxId));
-
-                // Route sample fine analysis to the Fine tab view to keep layout clear
-                fineLogArea.append(
-                        String.format("[%s] Returned %s: Strategy checked. Calculated penalty balance applied.\n",
-                                currentDateStr, bookId));
-
-                clearInputs();
             }
         });
     }
@@ -213,11 +260,5 @@ public class LibraryUI extends JFrame {
     private void clearInputs() {
         memberIdField.setText("");
         bookIdField.setText("");
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new LibraryUI().setVisible(true);
-        });
     }
 }

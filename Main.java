@@ -21,7 +21,6 @@ import facade.LibraryFacade;
 import factories.MemberFactory;
 import factories.BookFactory;
 import database.DatabaseConnection;
-import facade.LibraryFacade;
 import java.sql.Connection;
 import javax.swing.SwingUtilities;
 
@@ -132,26 +131,20 @@ public class Main {
                 System.out.println("Fine for 7 days late: ₹" + fine);
 
                 facade.returnBook(student, book, "T003");
+                System.out.println("=== Library Management System ===");
 
-                System.out.println("=== Initializing Library Management System ===");
-
-                // 1. Verify our MySQL Database Connection on startup
+                // Step 1 — Verify MySQL Database Connection
                 Connection conn = DatabaseConnection.getConnection();
-
                 if (conn == null) {
-                        System.err.println("🛑 System failure: Could not establish database connection. Exiting...");
+                        System.err.println("Database connection failed — exiting!");
                         return;
                 }
 
-                // 2. Initialize your central structural Facade pattern
-                // (Pass the database connection down if your architecture requires it)
-                LibraryFacade librarySystem = new LibraryFacade();
+                // Step 2 — System Ready
+                System.out.println("=== System Active ===");
+                System.out.println("Launching GUI...");
 
-                System.out.println("\n=== System Active ===");
-
-                System.out.println("Launching Graphical User Interface...");
-
-                // Safely spin up the window application thread
+                // Step 3 — Launch GUI on Event Dispatch Thread
                 SwingUtilities.invokeLater(() -> {
                         new LibraryUI().setVisible(true);
                 });
