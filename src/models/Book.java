@@ -9,4 +9,16 @@ public interface Book {
 
     String getBookId();
 
+    String getTitle();
+
+    String getAuthor();
+
+    String getIsbn();
+
+    String getPublisher();
+
+    String getEdition();
+
+    String getShelfLocation();
+
 }

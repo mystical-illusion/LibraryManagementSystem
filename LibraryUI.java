@@ -104,12 +104,12 @@ public class LibraryUI extends JFrame {
                 .setShelfLocation("C3-301").setCategory("technical")
                 .build();
 
-        libraryFacade.registerMember(m1);
-        libraryFacade.registerMember(m2);
-        libraryFacade.registerMember(m3);
-        libraryFacade.addBook(b1);
-        libraryFacade.addBook(b2);
-        libraryFacade.addBook(b3);
+        libraryFacade.registerMember(m1, "student");
+        libraryFacade.registerMember(m2, "professor");
+        libraryFacade.registerMember(m3, "staff");
+        libraryFacade.addBook(b1, "technical");
+        libraryFacade.addBook(b2, "story");
+        libraryFacade.addBook(b3, "technical");
     }
 
     private JTextArea createStyledTextArea() {

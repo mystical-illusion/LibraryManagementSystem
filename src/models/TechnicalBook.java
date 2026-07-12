@@ -46,4 +46,28 @@ public class TechnicalBook implements Book {
         return bookId;
     }
 
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public String getPublisher() {
+        return publisher;
+    }
+
+    public String getEdition() {
+        return edition;
+    }
+
+    public String getShelfLocation() {
+        return shelfLocation;
+    }
+
 }
