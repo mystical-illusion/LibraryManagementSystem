@@ -13,6 +13,21 @@ public class MemberDAO {
     }
 
     public void saveMember(Member member, String memberType) {
+        // Check if member already exists!
+        String checkSql = "SELECT member_id FROM members WHERE member_id = ?";
+        try {
+            PreparedStatement checkStmt = connection.prepareStatement(checkSql);
+            checkStmt.setInt(1, member.getMemberId());
+            java.sql.ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                System.out.println("Member already exists in DB: " + member.getMemberId());
+                return; // skip insert!
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking member: " + e.getMessage());
+        }
+
+        // If not exists, insert!
         String sql = "INSERT INTO members (member_id, name, department, email, member_type) " +
                 "VALUES (?, ?, ?, ?, ?)";
         try {
@@ -28,4 +43,5 @@ public class MemberDAO {
             System.err.println("Error saving member: " + e.getMessage());
         }
     }
+
 }

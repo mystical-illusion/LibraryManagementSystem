@@ -12,7 +12,35 @@ public class BookDAO {
         this.connection = DatabaseConnection.getConnection();
     }
 
+    public void updateAvailability(String bookId, boolean isAvailable) {
+        String sql = "UPDATE books SET is_available = ? WHERE book_id = ?";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            stmt.setBoolean(1, isAvailable);
+            stmt.setString(2, bookId);
+            stmt.executeUpdate();
+            System.out.println("Book availability updated: " + bookId);
+        } catch (SQLException e) {
+            System.err.println("Error updating book: " + e.getMessage());
+        }
+    }
+
     public void saveBook(Book book, String category) {
+        // Check if book already exists!
+        String checkSql = "SELECT book_id FROM books WHERE book_id = ?";
+        try {
+            PreparedStatement checkStmt = connection.prepareStatement(checkSql);
+            checkStmt.setString(1, book.getBookId());
+            java.sql.ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                System.out.println("Book already exists in DB: " + book.getBookId());
+                return; // skip insert!
+            }
+        } catch (SQLException e) {
+            System.err.println("Error checking book: " + e.getMessage());
+        }
+
+        // If not exists, insert!
         String sql = "INSERT INTO books (book_id, title, author, isbn, " +
                 "publisher, edition, shelf_location, is_available, category) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -31,19 +59,6 @@ public class BookDAO {
             System.out.println("Book saved to DB: " + book.getBookId());
         } catch (SQLException e) {
             System.err.println("Error saving book: " + e.getMessage());
-        }
-    }
-
-    public void updateAvailability(String bookId, boolean isAvailable) {
-        String sql = "UPDATE books SET is_available = ? WHERE book_id = ?";
-        try {
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setBoolean(1, isAvailable);
-            stmt.setString(2, bookId);
-            stmt.executeUpdate();
-            System.out.println("Book availability updated: " + bookId);
-        } catch (SQLException e) {
-            System.err.println("Error updating book: " + e.getMessage());
         }
     }
 }
